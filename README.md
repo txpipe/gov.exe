@@ -285,7 +285,7 @@ Licensed under the [Apache License, Version 2.0](./LICENSE). Per R7, from WP2 on
 
 ## Further reading
 
-- **Architecture spec** — the full technical architecture (internal, TxPipe engineering; the source for this README's content)
+- **[Architecture spec](./docs/architecture.md)** — the full technical architecture this README summarizes
 - **Cardano Budget 2026 proposal** — *GOV.EXE: Public Project Execution Integrity, Pilot in Argentina*
 - **Companion brief** — *Balius as an AI Agent Harness*
 - **TxPipe stack** — [Balius](https://github.com/txpipe/balius), [Pallas](https://github.com/txpipe/pallas), [Tx3](https://github.com/tx3-lang), [Dolos](https://github.com/txpipe/dolos), [Oura](https://github.com/txpipe/oura)
