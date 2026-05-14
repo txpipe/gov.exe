@@ -72,45 +72,53 @@ The requirements in §1 are the external contract. The principles below are the 
 
 ```mermaid
 flowchart TB
-    Chat["<b>Chat Interface</b><br/>Slack and/or MS Teams<br/>(per deployment).<br/>Officials converse with the agent,<br/>review drafts, trigger signing,<br/>query history."]
+    Officials([Officials])
+    Gov[Government systems]
 
-    SignPortal["<b>Signing Portal</b><br/>Thin web companion that brokers<br/>the institution's signing flow<br/>(launched from chat)."]
+    Chat[Chat]
+    Portal[Signing Portal]
+    Viewer[Evidence Viewer]
 
-    subgraph Agent["Orchestrator Agent — Balius components on baliusd"]
-        direction TB
-        Core["Handler graphs<br/>(Reader · Verifier · Composer ·<br/>Anomaly Watcher · Auditor)"]
-        LLMExt["LLM extension<br/>(llm_request / llm_response)"]
-        Tools["Tool extensions<br/>(state machine, precond runner,<br/>doc reader, adapters, tx builder)"]
-        ChatAdapter["Chat platform adapters<br/>(Slack / Teams) — extrinsic events"]
-        Attest["Attestation recorder<br/>(per-event checkpoints)"]
-        AuditAPI["Audit query API"]
+    subgraph Agent["Orchestrator agent (Balius)"]
+        direction LR
+        subgraph Roles["Roles"]
+            Reader
+            Verifier
+            Composer
+            Watcher[Anomaly Watcher]
+            Auditor
+        end
+        subgraph Extensions["Extensions"]
+            LLM
+            Adapters
+            TxBuilder[Tx builder]
+            Attestation
+        end
     end
 
-    GovSys["<b>Government Systems</b><br/>Compr.AR, Contrat.AR,<br/>accounting, signature infra,<br/>document registries"]
+    Storage[(Storage)]
 
-    subgraph Anchor["Cardano Anchoring"]
-        direction TB
-        Validator["Validator scripts"]
-        Meta["Metadata schema"]
-        TxSub["Tx submission<br/>(via Tx3 / Pallas)"]
-        Confirm["Confirmation tracking"]
+    subgraph Anchoring["Anchoring"]
+        Validator
+        Registry[Authority registry]
     end
 
-    Storage["<b>Agent Storage</b><br/>Project records · Evidence blobs<br/>Authority registry · Attestation logs<br/>State history index"]
+    Dolos
+    Oura
 
-    NodeAccess["<b>Cardano node access</b><br/>Dolos for read side,<br/>managed node or relay for write"]
-
-    Indexer["<b>Chain Indexer</b><br/>Oura → DB, reconciles<br/>on-chain history with the<br/>agent's off-chain state"]
-
-    Chat <--> Agent
-    Chat -.->|"signature request"| SignPortal
-    SignPortal --> Agent
-    Agent <--> GovSys
-    Agent --> Anchor
-    Agent <--> Storage
-    Anchor --> NodeAccess
-    NodeAccess --> Indexer
-    Indexer -.-> Storage
+    Officials --> Chat
+    Officials --> Portal
+    Officials --> Viewer
+    Chat <--> Roles
+    Portal --> Roles
+    Viewer --> Storage
+    Roles <--> Extensions
+    Extensions <--> Gov
+    Extensions <--> Storage
+    TxBuilder --> Anchoring
+    Anchoring --> Dolos
+    Dolos --> Oura
+    Oura -.-> Storage
 ```
 
 There are six logical components: **Chat Interface** (Slack and/or MS Teams), **Signing Portal** (thin web companion for institution-side signing flows), **Orchestrator Agent** (Balius components on `baliusd` — see §6.0), **Agent Storage**, **Cardano Anchoring layer** (on-chain validators + tx submission pipeline), and **Chain Indexer**. Plus external **Government Systems** that the agent integrates with.
