@@ -41,46 +41,49 @@ These are the platform's load-bearing requirements (R1–R8 in the architecture 
 
 ```mermaid
 flowchart TB
-    Chat["<b>Chat Interface</b><br/>Slack and/or MS Teams<br/>(per deployment)"]
+    Officials([Officials])
+    Gov[Government systems]
 
-    SignPortal["<b>Signing Portal</b><br/>Thin web companion that brokers<br/>the institution's signing flow"]
+    Chat[Chat]
+    Portal[Signing Portal]
+    Evidence[(Evidence storage)]
 
-    subgraph Agent["Orchestrator Agent — Balius components on baliusd"]
-        direction TB
-        Core["Handler graphs<br/>(Reader · Verifier · Composer ·<br/>Anomaly Watcher · Auditor)"]
-        LLMExt["LLM extension<br/>(llm_request / llm_response)"]
-        Tools["Tool extensions<br/>(state machine, precond runner,<br/>doc reader, adapters, tx builder)"]
-        ChatAdapter["Chat platform adapters<br/>(Slack / Teams)"]
-        Attest["Attestation recorder"]
-        AuditAPI["Audit query API"]
+    subgraph Harness["Harness (Balius)"]
+        direction LR
+        subgraph Agents["Agents"]
+            Reader
+            Verifier
+            Composer
+            Watcher[Anomaly Watcher]
+            Auditor
+        end
+        subgraph Extensions["Extensions"]
+            LLM
+            Adapters
+            TxBuilder[Tx builder]
+        end
     end
 
-    GovSys["<b>Government Systems</b><br/>Compr.AR, Contrat.AR,<br/>accounting, signature infra,<br/>document registries"]
-
-    subgraph Anchor["Cardano Anchoring"]
-        direction TB
-        Validator["Validator scripts"]
-        Meta["Metadata schema"]
-        TxSub["Tx submission<br/>(via Tx3 / Pallas)"]
-        Confirm["Confirmation tracking"]
+    subgraph Cardano["Cardano"]
+        StateMachine[On-chain state machine]
+        Registry[Authority registry]
     end
 
-    Storage["<b>Agent Storage</b><br/>Project records · Evidence blobs<br/>Authority registry · Attestation logs"]
-    NodeAccess["<b>Cardano node access</b><br/>Dolos for read, managed relay for write"]
-    Indexer["<b>Chain Indexer</b><br/>Oura → DB reconciliation"]
+    Dolos
 
-    Chat <--> Agent
-    Chat -.->|"signature request"| SignPortal
-    SignPortal --> Agent
-    Agent <--> GovSys
-    Agent --> Anchor
-    Agent <--> Storage
-    Anchor --> NodeAccess
-    NodeAccess --> Indexer
-    Indexer -.-> Storage
+    Officials --> Chat
+    Officials --> Portal
+    Chat <--> Agents
+    Portal --> Agents
+    Agents <--> Extensions
+    Extensions <--> Gov
+    Extensions <--> Evidence
+    TxBuilder --> Cardano
+    Cardano --> Dolos
+    Dolos -.-> Extensions
 ```
 
-Six logical components: **Chat Interface**, **Signing Portal**, **Orchestrator Agent** (Balius components on `baliusd`), **Agent Storage**, **Cardano Anchoring layer**, and **Chain Indexer** — plus external **Government Systems**.
+Three regions: **interaction surfaces** (Chat, Signing Portal); the **Balius harness** hosting Agents and Extensions; and **state** — Cardano holds the decision chain (on-chain state machine + authority registry), Evidence storage holds off-chain blobs. Government systems are reached through adapter Extensions; chain events arrive via Oura.
 
 ---
 
