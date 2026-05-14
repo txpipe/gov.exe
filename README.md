@@ -46,11 +46,11 @@ flowchart TB
 
     Chat[Chat]
     Portal[Signing Portal]
-    Viewer[Evidence Viewer]
+    Evidence[(Evidence storage)]
 
-    subgraph Agent["Orchestrator agent (Balius)"]
+    subgraph Harness["Harness (Balius)"]
         direction LR
-        subgraph Roles["Roles"]
+        subgraph Agents["Agents"]
             Reader
             Verifier
             Composer
@@ -61,36 +61,29 @@ flowchart TB
             LLM
             Adapters
             TxBuilder[Tx builder]
-            Attestation
         end
     end
 
-    Storage[(Storage)]
-
-    subgraph Anchoring["Anchoring"]
-        Validator
+    subgraph Cardano["Cardano"]
+        StateMachine[On-chain state machine]
         Registry[Authority registry]
     end
 
-    Dolos
     Oura
 
     Officials --> Chat
     Officials --> Portal
-    Officials --> Viewer
-    Chat <--> Roles
-    Portal --> Roles
-    Viewer --> Storage
-    Roles <--> Extensions
+    Chat <--> Agents
+    Portal --> Agents
+    Agents <--> Extensions
     Extensions <--> Gov
-    Extensions <--> Storage
-    TxBuilder --> Anchoring
-    Anchoring --> Dolos
-    Dolos --> Oura
-    Oura -.-> Storage
+    Extensions <--> Evidence
+    TxBuilder --> Cardano
+    Cardano --> Oura
+    Oura -.-> Extensions
 ```
 
-Six logical components: **Chat Interface**, **Signing Portal**, **Orchestrator Agent** (Balius components on `baliusd`), **Agent Storage**, **Cardano Anchoring layer**, and **Chain Indexer** — plus external **Government Systems**.
+Three regions: **interaction surfaces** (Chat, Signing Portal); the **Balius harness** hosting Agents and Extensions; and **state** — Cardano holds the decision chain (on-chain state machine + authority registry), Evidence storage holds off-chain blobs. Government systems are reached through adapter Extensions; chain events arrive via Oura.
 
 ---
 

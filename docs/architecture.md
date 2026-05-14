@@ -77,11 +77,11 @@ flowchart TB
 
     Chat[Chat]
     Portal[Signing Portal]
-    Viewer[Evidence Viewer]
+    Evidence[(Evidence storage)]
 
-    subgraph Agent["Orchestrator agent (Balius)"]
+    subgraph Harness["Harness (Balius)"]
         direction LR
-        subgraph Roles["Roles"]
+        subgraph Agents["Agents"]
             Reader
             Verifier
             Composer
@@ -92,36 +92,29 @@ flowchart TB
             LLM
             Adapters
             TxBuilder[Tx builder]
-            Attestation
         end
     end
 
-    Storage[(Storage)]
-
-    subgraph Anchoring["Anchoring"]
-        Validator
+    subgraph Cardano["Cardano"]
+        StateMachine[On-chain state machine]
         Registry[Authority registry]
     end
 
-    Dolos
     Oura
 
     Officials --> Chat
     Officials --> Portal
-    Officials --> Viewer
-    Chat <--> Roles
-    Portal --> Roles
-    Viewer --> Storage
-    Roles <--> Extensions
+    Chat <--> Agents
+    Portal --> Agents
+    Agents <--> Extensions
     Extensions <--> Gov
-    Extensions <--> Storage
-    TxBuilder --> Anchoring
-    Anchoring --> Dolos
-    Dolos --> Oura
-    Oura -.-> Storage
+    Extensions <--> Evidence
+    TxBuilder --> Cardano
+    Cardano --> Oura
+    Oura -.-> Extensions
 ```
 
-There are six logical components: **Chat Interface** (Slack and/or MS Teams), **Signing Portal** (thin web companion for institution-side signing flows), **Orchestrator Agent** (Balius components on `baliusd` — see §6.0), **Agent Storage**, **Cardano Anchoring layer** (on-chain validators + tx submission pipeline), and **Chain Indexer**. Plus external **Government Systems** that the agent integrates with.
+The picture has three regions. **Interaction surfaces** — Chat (Slack and/or MS Teams) and the Signing Portal (thin web companion for institution-side signing flows) — sit between officials and the platform. The **harness** is a `baliusd` instance hosting the GOV.EXE component (see §6.0); it contains the Agents (the five roles in §6.1) and the Extensions they call (LLM, adapters, tx builder). **State** lives in two places: Cardano carries the decision chain (on-chain state machine + authority registry, §5), and an off-chain Evidence storage holds the document blobs the chain anchors by hash (§7). External Government Systems are reached through adapter Extensions; chain events arrive into the harness via Oura.
 
 ---
 
