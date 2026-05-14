@@ -69,7 +69,7 @@ flowchart TB
         Registry[Authority registry]
     end
 
-    Oura
+    Dolos
 
     Officials --> Chat
     Officials --> Portal
@@ -80,7 +80,7 @@ flowchart TB
     Extensions <--> Evidence
     TxBuilder --> Cardano
     Cardano --> Oura
-    Oura -.-> Extensions
+    Dolos -.-> Extensions
 ```
 
 Three regions: **interaction surfaces** (Chat, Signing Portal); the **Balius harness** hosting Agents and Extensions; and **state** — Cardano holds the decision chain (on-chain state machine + authority registry), Evidence storage holds off-chain blobs. Government systems are reached through adapter Extensions; chain events arrive via Oura.

@@ -100,7 +100,7 @@ flowchart TB
         Registry[Authority registry]
     end
 
-    Oura
+    Dolos
 
     Officials --> Chat
     Officials --> Portal
@@ -111,7 +111,7 @@ flowchart TB
     Extensions <--> Evidence
     TxBuilder --> Cardano
     Cardano --> Oura
-    Oura -.-> Extensions
+    Dolos -.-> Extensions
 ```
 
 The picture has three regions. **Interaction surfaces** — Chat (Slack and/or MS Teams) and the Signing Portal (thin web companion for institution-side signing flows) — sit between officials and the platform. The **harness** is a `baliusd` instance hosting the GOV.EXE component (see §6.0); it contains the Agents (the five roles in §6.1) and the Extensions they call (LLM, adapters, tx builder). **State** lives in two places: Cardano carries the decision chain (on-chain state machine + authority registry, §5), and an off-chain Evidence storage holds the document blobs the chain anchors by hash (§7). External Government Systems are reached through adapter Extensions; chain events arrive into the harness via Oura.
